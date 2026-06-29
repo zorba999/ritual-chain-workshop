@@ -6,7 +6,7 @@ import { useBounty } from "@/hooks/useBounty";
 import { isAddressEqual } from "@/lib/format";
 import { decodeAiReview } from "@/lib/aiReview";
 import { BountyDetail } from "@/components/BountyDetail";
-import { SubmitAnswer } from "@/components/SubmitAnswer";
+import { CommitReveal } from "@/components/CommitReveal";
 import { JudgeAll } from "@/components/JudgeAll";
 import { FinalizeWinner } from "@/components/FinalizeWinner";
 import { AIReviewDisplay } from "@/components/AIReviewDisplay";
@@ -59,10 +59,10 @@ export function BountyView({ bountyId }: { bountyId: bigint }) {
       {/* Left column: details + owner/participant actions */}
       <div className="space-y-4">
         <BountyDetail bountyId={bountyId} bounty={bounty} isOwner={isOwner} />
-        <SubmitAnswer
+        <CommitReveal
           bountyId={bountyId}
           bounty={bounty}
-          onSubmitted={reload}
+          onChanged={reload}
         />
         <JudgeAll
           bountyId={bountyId}
@@ -83,7 +83,7 @@ export function BountyView({ bountyId }: { bountyId: bigint }) {
         {bounty.judged && <AIReviewDisplay aiReview={bounty.aiReview} />}
         <SubmissionsList
           bountyId={bountyId}
-          count={Number(bounty.submissionCount)}
+          count={Number(bounty.revealedCount)}
           judge={judge}
           finalWinner={
             bounty.finalized ? Number(bounty.winnerIndex) : undefined

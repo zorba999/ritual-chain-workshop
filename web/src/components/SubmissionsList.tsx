@@ -25,12 +25,14 @@ export function SubmissionsList({
     <Card>
       <CardHeader
         title="Submissions"
-        subtitle="All submissions are judged together after the deadline."
+        subtitle="Revealed answers, judged together after the reveal deadline."
         action={<Badge tone="zinc">{count}</Badge>}
       />
       <CardBody className="space-y-3">
         {count === 0 ? (
-          <p className="text-sm text-zinc-500">No submissions yet.</p>
+          <p className="text-sm text-zinc-500">
+            No answers revealed yet. Answers stay hidden until the reveal phase.
+          </p>
         ) : (
           indices.map((i) => (
             <SubmissionRow
@@ -64,7 +66,7 @@ function SubmissionRow({
   const { data, isLoading } = useReadContract({
     address: contractAddress,
     abi: aiJudgeAbi,
-    functionName: "getSubmission",
+    functionName: "getRevealedSubmission",
     args: [bountyId, BigInt(index)],
     chainId: ritualChain.id,
     query: { enabled: !!contractAddress },

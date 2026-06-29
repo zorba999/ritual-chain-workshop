@@ -3,7 +3,7 @@
 import type { Bounty } from "@/lib/bounty";
 import { getBountyStatus, STATUS_META } from "@/lib/bounty";
 import { useNow } from "@/hooks/useNow";
-import { shortenAddress, formatReward, formatTimestamp, formatRelative } from "@/lib/format";
+import { shortenAddress, formatReward, formatTimestampMs, formatRelativeMs } from "@/lib/format";
 import { Card, CardHeader, CardBody, Badge, Stat } from "@/components/ui";
 
 export function BountyDetail({
@@ -16,7 +16,7 @@ export function BountyDetail({
   isOwner: boolean;
 }) {
   const now = useNow();
-  const status = getBountyStatus(bounty, now / 1000);
+  const status = getBountyStatus(bounty, now);
   const meta = STATUS_META[status];
 
   return (
@@ -47,19 +47,31 @@ export function BountyDetail({
 
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-2">
           <Stat label="Reward" value={formatReward(bounty.reward)} />
-          <Stat label="Submissions" value={bounty.submissionCount.toString()} />
+          <Stat label="Owner" value={shortenAddress(bounty.owner)} />
+          <Stat label="Committed" value={bounty.committerCount.toString()} />
+          <Stat label="Revealed" value={bounty.revealedCount.toString()} />
           <Stat
-            label="Deadline"
+            label="Submission deadline"
             value={
               <span>
-                {formatTimestamp(bounty.deadline)}
+                {formatTimestampMs(bounty.submissionDeadline)}
                 <span className="ml-1 text-xs text-zinc-500">
-                  ({formatRelative(bounty.deadline)})
+                  ({formatRelativeMs(bounty.submissionDeadline)})
                 </span>
               </span>
             }
           />
-          <Stat label="Owner" value={shortenAddress(bounty.owner)} />
+          <Stat
+            label="Reveal deadline"
+            value={
+              <span>
+                {formatTimestampMs(bounty.revealDeadline)}
+                <span className="ml-1 text-xs text-zinc-500">
+                  ({formatRelativeMs(bounty.revealDeadline)})
+                </span>
+              </span>
+            }
+          />
         </div>
 
         {bounty.finalized && (
