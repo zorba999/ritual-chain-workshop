@@ -163,5 +163,42 @@ npx hardhat ignition deploy --network ritual ignition/modules/CommitRevealAIJudg
 
 ---
 
+## ✅ Verified live on Ritual Chain
+
+The full lifecycle was run end-to-end on Ritual Chain (chainId `1979`) with **real
+AI judging**, not just local mocks:
+
+- **Deployed contract:** `0x93fec7789231ffdc05d7adbba8742f26b3d53337`
+- **Flow exercised:** `deploy → createBounty → submitCommitment ×2 →
+  revealAnswer ×2 → judgeAll → finalizeWinner` (reward paid out).
+- **Batch judging:** one Ritual LLM inference (`GLM-4.7` running in the TEE) over
+  both revealed answers returned:
+
+  ```json
+  { "winnerIndex": 0, "summary": "Submission 0 provides a high-impact optimization tip regarding storage reads, which are among the most expensive operations in the EVM, and includes the specific gas cost to justify the optimization." }
+  ```
+
+- Final on-chain state: `judged=true, finalized=true, winnerIndex=0, reward=0`.
+
+Demo scripts (key passed via `DEPLOYER_PRIVATE_KEY` env var, never hard-coded):
+
+```bash
+cd hardhat
+npx hardhat build
+DEPLOYER_PRIVATE_KEY=0x... node scripts/e2e-ritual.mjs   # full lifecycle
+```
+
+### Two Ritual gotchas worth noting
+
+1. **`block.timestamp` is in milliseconds** on Ritual, not seconds — deadlines in
+   the demo are derived from the chain's own `block.timestamp` to stay correct.
+2. **`judgeAll` requires the calling EOA to pre-fund the Ritual Wallet**
+   (`0x532F0dF0896F353d8C3DD8cc134e8129DA2a3948`): deposit ≥ `0.05 RITUAL` with a
+   lock that outlives the inference TTL, otherwise the LLM precompile rejects the
+   async payload (`insufficient lock duration`). The demo handles this with a
+   `deposit(lockDuration)` call before judging.
+
+---
+
 *Original workshop starter: `/hardhat` holds the smart contracts, `/web` holds
 the Next.js frontend.*
